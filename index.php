@@ -23,13 +23,14 @@ function create_chapter($f3)
 	$chapter->title = $_REQUEST["title"];
 	$yarn->ownChapter[] = $chapter;
 	R::store($yarn);
-	echo json_encode( array("chapter_id"=>$chapter->id, "title"=>$chapter->title));
+	echo json_encode( array("id"=>$chapter->id, "title"=>$chapter->title));
 }
 
 function js_templates($f3)
 {
 	echo View::instance()->render('jstemplates.htm');
 }
+
 
 function chapters($f3)
 {
@@ -53,7 +54,7 @@ function get_chapter($f3)
 	{
 		$f3->error(404);
 	}
-	echo json_encode(array("chapter_id"=>$chapter->id, "title"=>$chapter->title));
+	echo json_encode($chapter->export());
 }
 
 function get_yarn($f3)
@@ -64,10 +65,8 @@ function get_yarn($f3)
 	{
 		$f3->error(404);
 	}
-	echo json_encode(array("yarn_id"=>$yarn->id, "title"=>$yarn->title));
+	echo json_encode($yarn->export());
 }
-
-
 
 function create_node($f3) {
 	$chapter = R::load("chapter", $_REQUEST["chapterid"]);
@@ -76,7 +75,7 @@ function create_node($f3) {
 	$chapter->ownNode[] = $node;
 	R::store($chapter);
 	
-	echo json_encode(array("node_id"=>$node->id, "description"=>$node->description));
+	echo json_encode(array("id"=>$node->id, "description"=>$node->description));
 
 }
 
@@ -90,6 +89,26 @@ function nodes($f3)
 	$nodes = $chapter->ownNode;
 
 	echo json_encode(R::exportAll($nodes));
+}
+
+function get_node($f3)
+{
+	$node = R::load("node", $f3->get("PARAMS.id"));
+	echo json_encode($node->export());
+}
+
+function update_node($f3)
+{
+	$node = R::load("node", $_REQUEST["nodeid"]);
+	if( !$node->id )
+	{
+		$f3->error(404);
+	}		
+	
+	$node->text = $_REQUEST["text"];
+
+	R::store($node);	
+
 }
 
 $f3->run();

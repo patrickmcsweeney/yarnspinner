@@ -47,7 +47,7 @@ function createChapter(title) {
 function renderChapter(data)
 {
 	var chapter = $($.Mustache.render('chapter', data));
-	chapter.data('id', data.chapter_id);
+	chapter.data('id', data.id);
 	chapter.click(switchChapter);
 	$(".chapters").append(chapter);
 	return chapter;
@@ -108,10 +108,9 @@ function createNode(description) {
 	});
 }
 
-function renderNode(data)
-{
+function renderNode(data) {
 	var node = $($.Mustache.render('node', data));
-	node.data('id', data.node_id);
+	node.data('id', data.id);
 	node.click(switchChapter);
 	$(".node-selector").append(node);
 	return node;
@@ -129,5 +128,20 @@ function loadNodes(){
 			renderNode(data[i]);
 		}
         });
+}
+
+function saveNode() {
+	var data = {};
+	data.nodeid = document.nodeid;
+	data.text = $("textarea.rich-text").val();
+	$.ajax({
+                type: "POST",
+                url: "/save/node",
+                "data": data
+        }).done(function(json) {
+		alert("cool");
+        });
+
+
 }
 
