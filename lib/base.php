@@ -121,7 +121,7 @@ final class Base {
 	*	@param $key string
 	**/
 	private function cut($key) {
-		return preg_split('/\[\h*[\'"]?(.+?)[\'"]?\h*\]|(->)|\./',
+		return preg_split('/\[\s*[\'"]?(.+?)[\'"]?\s*\]|(->)|\./',
 			$key,NULL,PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
 	}
 
@@ -755,8 +755,8 @@ final class Base {
 				preg_match_all(
 					'/(?<=^|\n)(?:'.
 					'(?:;[^\n]*)|(?:<\?php.+?\?>?)|'.
-					'(.+?)\h*=\h*'.
-					'((?:\\\\\h*\r?\n|.+?)*)'.
+					'(.+?)\s*=\s*'.
+					'((?:\\\\\s*\r?\n|.+?)*)'.
 					')(?=\r?\n|$)/',
 					file_get_contents($file),$matches,PREG_SET_ORDER);
 				if ($matches)
@@ -764,7 +764,7 @@ final class Base {
 						if (isset($match[1]) &&
 							!array_key_exists($match[1],$lex))
 							$lex[$match[1]]=trim(preg_replace(
-								'/(?<!\\\\)"|\\\\\h*\r?\n/','',$match[2]));
+								'/(?<!\\\\)"|\\\\\s*\r?\n/','',$match[2]));
 			}
 		}
 		return $lex;
@@ -922,8 +922,8 @@ final class Base {
 	**/
 	function mock($pattern,array $args=NULL,array $headers=NULL,$body=NULL) {
 		$types=array('sync','ajax');
-		preg_match('/([\|\w]+)\h+([^\h]+)'.
-			'(?:\h+\[('.implode('|',$types).')\])?/',$pattern,$parts);
+		preg_match('/([\|\w]+)\s+([^\s]+)'.
+			'(?:\s+\[('.implode('|',$types).')\])?/',$pattern,$parts);
 		if (empty($parts[2]))
 			user_error(sprintf(self::E_Pattern,$pattern));
 		$verb=strtoupper($parts[1]);
@@ -964,8 +964,8 @@ final class Base {
 				$this->route($item,$handler,$ttl,$kbps);
 			return;
 		}
-		preg_match('/([\|\w]+)\h+([^\h]+)'.
-			'(?:\h+\[('.implode('|',$types).')\])?/',$pattern,$parts);
+		preg_match('/([\|\w]+)\s+([^\s]+)'.
+			'(?:\s+\[('.implode('|',$types).')\])?/',$pattern,$parts);
 		if (empty($parts[2]))
 			user_error(sprintf(self::E_Pattern,$pattern));
 		$type=empty($parts[3])?
@@ -1178,7 +1178,7 @@ final class Base {
 			$args=array($args);
 		// Execute function; abort if callback/hook returns FALSE
 		if (is_string($func) &&
-			preg_match('/(.+)\h*(->|::)\h*(.+)/s',$func,$parts)) {
+			preg_match('/(.+)\s*(->|::)\s*(.+)/s',$func,$parts)) {
 			// Convert string to executable PHP callback
 			if (!class_exists($parts[1]))
 				$this->error(404);
@@ -1250,8 +1250,8 @@ final class Base {
 			'/(?<=^|\n)(?:'.
 			'(?:;[^\n]*)|(?:<\?php.+?\?>?)|'.
 			'(?:\[(.+?)\])|'.
-			'(.+?)\h*=\h*'.
-			'((?:\\\\\h*\r?\n|.+?)*)'.
+			'(.+?)\s*=\s*'.
+			'((?:\\\\\s*\r?\n|.+?)*)'.
 			')(?=\r?\n|$)/',
 			file_get_contents($file),$matches,PREG_SET_ORDER);
 		if ($matches) {
@@ -1275,7 +1275,7 @@ final class Base {
 								return $val+0;
 							if (preg_match('/^\w+$/i',$val) && defined($val))
 								return constant($val);
-							return preg_replace('/\\\\\h*\r?\n/','',$val);
+							return preg_replace('/\\\\\s*\r?\n/','',$val);
 						},
 						// Mark quoted strings with 0x00 whitespace
 						str_getcsv(preg_replace(
@@ -1783,14 +1783,14 @@ class Cache extends Prefab {
 					else
 						memcache_add_server($this->ref,$host,$port);
 				}
-			if (empty($this->ref) && !preg_match('/^folder\h*=/',$dsn))
+			if (empty($this->ref) && !preg_match('/^folder\s*=/',$dsn))
 				$dsn=($grep=preg_grep('/^(apc|wincache|xcache)/',
 					array_map('strtolower',get_loaded_extensions())))?
 						// Auto-detect
 						current($grep):
 						// Use filesystem as fallback
 						('folder='.$fw->get('TEMP').'cache/');
-			if (preg_match('/^folder\h*=\h*(.+)/',$dsn,$parts) &&
+			if (preg_match('/^folder\s*=\s*(.+)/',$dsn,$parts) &&
 				!is_dir($parts[1]))
 				mkdir($parts[1],Base::MODE,TRUE);
 		}
