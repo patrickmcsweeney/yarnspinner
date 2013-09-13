@@ -43,4 +43,30 @@ function chapters($f3)
 	echo json_encode(R::exportAll($chapters));
 }
 
+/* JSON Getters */
+
+function get_chapter($f3)
+{
+	$id = $f3->get('PARAMS.id');
+	$chapter = R::load('chapter', $id);
+	if(!$chapter->id)
+	{
+		$f3->error(404);
+	}
+	echo json_encode(array("chapter_id"=>$chapter->id, "title"=>$chapter->title));
+}
+
+function get_yarn($f3)
+{
+	$id = $f3->get('PARAMS.id');
+	$yarn = R::load('yarn', $id);
+	if(!$yarn->id)
+	{
+		$f3->error(404);
+	}
+	echo json_encode(array("yarn_id"=>$yarn->id, "title"=>$yarn->title));
+}
+
+
+
 $f3->run();
