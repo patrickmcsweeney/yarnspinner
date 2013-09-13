@@ -54,6 +54,7 @@ function set_start_chapter($f3)
 	foreach($chapters as $c) {
 		if($c->id == $chapter->id) {
 			$yarn->startChapter = $chapter;
+			R::store($yarn);
 			echo json_encode($yarn->export());
 			return;
 		}
@@ -161,12 +162,67 @@ function update_node($f3)
 	if( !$node->id )
 	{
 		$f3->error(404);
-	}		
+	}
+	$transition = R::load("chapter", $_REQUEST["transition"]);
+	if(!$transition->id)
+	{
+		$f3->error(404);
+	}
+	print "0";
+
+	$yarn = $node->chapter->yarn;
+	$chapters = $yarn->ownChapter;
 	
+	$valid_chapter = false;
+	foreach($chapters as $c) {
+		if($c->id == $transition->id) {
+			$valid_chapter = true;
+		}
+	}
+	print "1";
+	
+	if(!$valid_chapter) {
+		$f3->error(404);
+	}
+	print "2";
+	$node->transition = $transition;
 	$node->text = $_REQUEST["text"];
-
+	$node->location = $_REQUEST["location"];
+	print "3";
 	R::store($node);	
+	echo json_encode($node->export());
+}
 
+function set_next_chapter($f3)
+{
+	$nid = $f3->get('PARAMS.id');
+	$node = R::load('node', $nid);
+	
+	if(!$node->id) {
+		$f3->error(404);
+	}
+
+	$yarn = $node->chapter->yarn;
+
+	$cid = $_REQUEST["chapterid"];
+	$chapter = R::load('chapter', $cid);
+	if(!$chapter->id) {
+	 	$f3->error(404);
+	}
+	
+	$chapters = $yarn->ownChapter;
+	
+
+	foreach($chapters as $c) {
+		if($c->id == $chapter->id) {
+			$node->nextChapter = $chapter;
+			R::store($node);
+			echo json_encode($node->export());
+			return;
+		}
+	}
+
+	$f3->error(404);
 }
 
 $f3->run();
