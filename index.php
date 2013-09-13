@@ -31,6 +31,7 @@ function js_templates($f3)
 	echo View::instance()->render('jstemplates.htm');
 }
 
+
 function chapters($f3)
 {
 	$yarn = R::load('yarn',$_REQUEST["yarnid"]);
