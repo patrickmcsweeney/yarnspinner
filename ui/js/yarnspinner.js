@@ -5,6 +5,8 @@ $.Mustache.load('/jstemplates');
 $(document).ready(function() {
 	loadChapters()
 	loadNodes()
+	loadLocationList()
+	//loadCurrentNode() now happens in the .done() of location
 });
 
 function addChapter() {
@@ -67,6 +69,7 @@ function loadChapters(){
 		for(var i = 0; i < data.length; i++)
 		{
 			renderChapter(data[i]);
+			$("#transition-options").mustache('transition-option', data[i]);
 		}
         });
 }
@@ -134,6 +137,8 @@ function saveNode() {
 	var data = {};
 	data.nodeid = document.nodeid;
 	data.text = $("textarea.rich-text").val();
+	data.transition = $("select#transition-options").val();
+	data.location = $("select#location-options").val();
 	$.ajax({
                 type: "POST",
                 url: "/save/node",
@@ -143,5 +148,32 @@ function saveNode() {
         });
 
 
+}
+
+function loadCurrentNode() {
+	$.ajax({
+                type: "GET",
+                url: "/data/node/"+document.nodeid
+        }).done(function(json) {
+		var data = JSON.parse(json);
+		$("textarea.rich-text").val(data.text);	
+		$("select#transition-options").val(data.transition_id);
+		$("select#location-options").val(data.location);
+        });
+}
+
+function loadLocationList() {
+	$.ajax({
+                type: "GET",
+                url: "/data/tags"
+        }).done(function(json) {
+		var data = JSON.parse(json);
+		
+		for(var i = 0; i < data.length; i++)
+		{
+			$("select#location-options").mustache('location-option', {name:data[i]});	
+		}
+		loadCurrentNode()
+        });
 }
 
