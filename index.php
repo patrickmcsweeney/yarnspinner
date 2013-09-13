@@ -17,6 +17,11 @@ function js_templates($f3)
 	echo View::instance()->render('jstemplates.htm');
 }
 
+function tags()
+{
+	echo file_get_contents('http://tools.southampton.ac.uk/places/keywords/keywords.json');
+}
+
 /* Yarns */
 
 function new_yarn($title, $description)
