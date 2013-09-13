@@ -43,4 +43,32 @@ function chapters($f3)
 	echo json_encode(R::exportAll($chapters));
 }
 
+function create_node($f3) {
+	$chapter = R::load("chapter", $_REQUEST["chapterid"]);
+	if(!$chapter->id)
+	{
+		$f3->error(404);
+	}
+
+	$node = R::dispense("node");
+	$node->description = $_REQUEST["description"];
+	$chapter->ownNode[] = $node;
+	R::store($chapter);
+	
+	echo json_encode(array("node_id"=>$node->id, "description"=>$node->description));
+
+}
+
+function nodes($f3)
+{
+	$chapter = R::load('chapter',$_REQUEST["chapterid"]);
+	if(!$chapter->id)
+	{
+		$f3->error(404);
+	}
+	$nodes = $chapter->ownNode;
+
+	echo json_encode(R::exportAll($nodes));
+}
+
 $f3->run();
