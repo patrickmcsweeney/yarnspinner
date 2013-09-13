@@ -12,12 +12,60 @@ function home($f3)
 	echo Template::instance()->render('template.htm');
 }
 
+function js_templates($f3)
+{
+	echo View::instance()->render('jstemplates.htm');
+}
+
+/* Yarns */
+
+function new_yarn($title, $description)
+{
+	# Create an initial chapter
+	$chapter = R::dispense("chapter");
+	$chapter->title = "New Chapter";
+	R::store($chapter);
+
+	# Create the yarn
+	$yarn = R::dispense("yarn");
+	$yarn->title = $title;
+	$yarn->description = $description;
+	$yarn->ownChapter[] = $chapter;
+	$yarn->startChapter = $chapter;
+	R::store($yarn);
+}
+
+function create_yarn($f3)
+{
+	$yarn = new_yarn($_REQUEST["title"], $_REQUEST["description"]);
+	echo json_encode($yarn->export());
+}
+
+function yarns($f3)
+{
+	$yarns = R::findAll('yarn');
+	echo json_encode(R::exportAll($yarns));
+}
+
+function get_yarn($f3)
+{
+	$id = $f3->get('PARAMS.id');
+	$yarn = R::load('yarn', $id);
+	if(!$yarn->id)
+	{
+		$f3->error(404);
+	}
+	echo json_encode($yarn->export());
+}
+
+/* Chapters */
+
 function create_chapter($f3)
 {
 	$yarn = R::load('yarn',$_REQUEST["yarnid"]);
 	if(!$yarn->id)
 	{
-		$f3->errror(404);
+		$f3->error(404);
 	}
 	$chapter = R::dispense("chapter");
 	$chapter->title = $_REQUEST["title"];
@@ -25,12 +73,6 @@ function create_chapter($f3)
 	R::store($yarn);
 	echo json_encode( array("id"=>$chapter->id, "title"=>$chapter->title));
 }
-
-function js_templates($f3)
-{
-	echo View::instance()->render('jstemplates.htm');
-}
-
 
 function chapters($f3)
 {
@@ -44,8 +86,6 @@ function chapters($f3)
 	echo json_encode(R::exportAll($chapters));
 }
 
-/* JSON Getters */
-
 function get_chapter($f3)
 {
 	$id = $f3->get('PARAMS.id');
@@ -57,16 +97,7 @@ function get_chapter($f3)
 	echo json_encode($chapter->export());
 }
 
-function get_yarn($f3)
-{
-	$id = $f3->get('PARAMS.id');
-	$yarn = R::load('yarn', $id);
-	if(!$yarn->id)
-	{
-		$f3->error(404);
-	}
-	echo json_encode($yarn->export());
-}
+/* Nodes */
 
 function create_node($f3) {
 	$chapter = R::load("chapter", $_REQUEST["chapterid"]);
