@@ -54,7 +54,7 @@ function get_chapter($f3)
 	{
 		$f3->error(404);
 	}
-	echo json_encode(array("chapter_id"=>$chapter->id, "title"=>$chapter->title));
+	echo json_encode($chapter->export());
 }
 
 function get_yarn($f3)
@@ -65,7 +65,7 @@ function get_yarn($f3)
 	{
 		$f3->error(404);
 	}
-	echo json_encode(array("yarn_id"=>$yarn->id, "title"=>$yarn->title));
+	echo json_encode($yarn->export());
 }
 
 
