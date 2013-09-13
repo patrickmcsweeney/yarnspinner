@@ -1,0 +1,44 @@
+<html>
+<head>
+	<title>Geospacial narrative creation - YarnSpinner</title>
+	<link rel="stylesheet" href="/ui/css/style.css" type="text/css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="https://raw.github.com/jonnyreeves/jquery-Mustache/master/jquery.mustache.js"></script>
+<script src="https://raw.github.com/janl/mustache.js/master/mustache.js"></script>
+	<script type="text/javascript" src="/ui/js/yarnspinner.js"></script>
+<!--	<script type="text/javascript" src="/ui/js/tinymce/tinymce.min.js"></script>
+	<script type="text/javascript">
+	tinymce.init({
+	    selector: "textarea.rich-text",
+	    height: '100%'
+
+	 });
+	</script>-->
+
+</head>
+<body>
+	<div class="chapters">
+		<input type="button" value="Add chapter" onclick="addChapter()"/>
+	</div>
+	<div class="node-text">
+		<form name="main-text" action="/save/text/">
+			<textarea class="rich-text"></textarea>
+		</form>
+	</div><!--
+	--><div class="node-manager">
+		<div class="node-selector">
+
+		</div>
+		<div class="node-attributes">
+			
+		</div>
+		<div class="node-location">
+
+		</div>
+		<div class="node-summary">
+
+		</div>
+		
+	</div>
+</body>
+</html>
