@@ -19,19 +19,16 @@
 <body>
 	<div class="chapters">
 		<input type="button" value="Add chapter" onclick="addChapter()"/>
+		<input type="button" value="Add node" onclick="addNode()"/>
 	</div>
-	<div class="node-text">
-		<form name="main-text" action="/save/text/">
-			<textarea class="rich-text"></textarea>
-		</form>
-	</div><!--
-	--><div class="node-manager">
-		<div class="node-selector">
-			<input type="button" value="Add node" onclick="addNode()"/>
-
+	<div class="node-manager">
+		<div class="node-text">
+			<form name="main-text" action="/save/text/">
+				<textarea class="rich-text"></textarea>
+			</form>
 		</div>
 		<div class="node-attributes">
-			<p>transition: 
+			<p>Next chapter: 
 				<select id="transition-options">
 
 				</select>

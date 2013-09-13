@@ -3,27 +3,27 @@ html, body{
 	padding:0;
 }
 .chapters {
-	height: 1em;
-	padding: 10px 0;
+	width: 25%;
+	height: 95%;
+	padding: 10px;
+	float: left;
 	background-color: red;
+	font-size: 14pt;
 }
 .node-text {
-	width: 33.3%;
-	min-height: 400px;
-	background-color: blue;
-	float:left;
 }
 .node-manager {
-	width: 66.6%;
+	width: 70%;
 	min-height: 400px;
 	float:left;
 	background-color: green;
 }
 .node-selector {
 	background-color:purple;
+	padding-left: 2em;
+	font-size: 10pt;
 }
 .node-attributes {
-	height: 3em;
 	background-color:gray;
 }
 .node-location{
@@ -36,5 +36,5 @@ html, body{
 }
 textarea {
 	width:100%;
-	height:100%;
+	height:45%;
 }

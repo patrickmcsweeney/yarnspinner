@@ -2,12 +2,19 @@ document.yarnid = 1;
 document.chapterid = 1;
 document.nodeid = 1;
 $.Mustache.load('/jstemplates');
+document.refreshEverything = [loadChapters, loadNodes,loadLocationList,loadCurrentNode];
+document.functionList = document.refreshEverything.slice(0); 
+
 $(document).ready(function() {
-	loadChapters()
-	loadNodes()
-	loadLocationList()
-	//loadCurrentNode() now happens in the .done() of location
+	execNext();
 });
+
+function execNext()
+{
+	if(document.functionList.length == 0) { return; }
+	var func = document.functionList.shift()
+	func();
+}
 
 function addChapter() {
 
@@ -31,6 +38,7 @@ function addChapter() {
 	});
 
 	$(".chapters").append(inputBox);
+	inputBox.focus();
 }
 
 function createChapter(title) {
@@ -56,10 +64,21 @@ function renderChapter(data)
 }
 
 function switchChapter(event) {
-	alert($(event.target).data('id'));
+	document.chapterid = $(event.target).data('id');
+	document.functionList = document.refreshEverything.slice(0); 
+	execNext();
+	
+}
+
+function switchNode(event) {
+	document.nodeid = $(event.target).data('id');
+	document.functionList = document.refreshEverything.slice(0); 
+	execNext();
 }
 
 function loadChapters(){
+	$("#transition-options option").remove()
+	$(".chapters div").remove();
 	$.ajax({
                 type: "GET",
                 url: "/data/chapters",
@@ -70,13 +89,17 @@ function loadChapters(){
 		{
 			renderChapter(data[i]);
 			$("#transition-options").mustache('transition-option', data[i]);
+			if(data[i].id == document.chapterid)
+			{
+				$(".chapters").mustache('node-selector');
+			}
 		}
+		execNext()
         });
 }
 
 function addNode(){
 	var inputBox = $("<input type='text' />");
-
 	inputBox.keydown(function(event) {
 		if(event.which==13)
 		{
@@ -95,6 +118,7 @@ function addNode(){
 	});
 
 	$(".node-selector").append(inputBox);
+	inputBox.focus();
 
 }
 
@@ -114,7 +138,7 @@ function createNode(description) {
 function renderNode(data) {
 	var node = $($.Mustache.render('node', data));
 	node.data('id', data.id);
-	node.click(switchChapter);
+	node.click(switchNode);
 	$(".node-selector").append(node);
 	return node;
 }
@@ -130,6 +154,7 @@ function loadNodes(){
 		{
 			renderNode(data[i]);
 		}
+		execNext();
         });
 }
 
@@ -159,6 +184,7 @@ function loadCurrentNode() {
 		$("textarea.rich-text").val(data.text);	
 		$("select#transition-options").val(data.transition_id);
 		$("select#location-options").val(data.location);
+		execNext();
         });
 }
 
@@ -173,7 +199,7 @@ function loadLocationList() {
 		{
 			$("select#location-options").mustache('location-option', {name:data[i]});	
 		}
-		loadCurrentNode()
+		execNext();
         });
 }
 
