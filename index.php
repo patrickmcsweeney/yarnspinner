@@ -35,6 +35,33 @@ function new_yarn($title, $description)
 	R::store($yarn);
 }
 
+function set_start_chapter($f3)
+{
+	$yid = $f3->get('PARAMS.id');
+	$yarn = R::load('yarn', $yid);
+	$cid = $_REQUEST["chapterid"];
+	$chapter = R::load('chapter', $cid);
+	if(!$yarn->id) {
+		$f3->error(404);
+	}
+	if(!$chapter->id) {
+		$f3->error(404);
+	}
+	
+	$chapters = $yarn->ownChapter;
+	
+
+	foreach($chapters as $c) {
+		if($c->id == $chapter->id) {
+			$yarn->startChapter = $chapter;
+			echo json_encode($yarn->export());
+			return;
+		}
+	}
+
+	$f3->error(404);
+}
+
 function create_yarn($f3)
 {
 	$yarn = new_yarn($_REQUEST["title"], $_REQUEST["description"]);
