@@ -2,7 +2,8 @@ document.yarnid = 1;
 document.chapterid = 1;
 document.nodeid = 1;
 $.Mustache.load('/jstemplates');
-document.refreshEverything = [loadChapters, loadNodes,loadLocationList,loadCurrentNode];
+//document.refreshEverything = [loadChapters, loadNodes,loadLocationList,loadCurrentNode];
+document.refreshEverything = [setupMap, loadChapters, loadNodes,loadCurrentNode];
 document.functionList = document.refreshEverything.slice(0); 
 
 $(document).ready(function() {
@@ -49,8 +50,9 @@ function createChapter(title) {
 			"yarnid":document.yarnid
 		}
 	}).done(function(json) {
-		var data = JSON.parse(json);
-		renderChapter(data);
+		//var data = JSON.parse(json);
+		//renderChapter(data);
+		renderChapter(json);
 	});
 }
 
@@ -84,7 +86,8 @@ function loadChapters(){
                 url: "/data/chapters",
                 data: { "yarnid": document.yarnid }
         }).done(function(json) {
-                var data = JSON.parse(json);
+                //var data = JSON.parse(json);
+                var data = json;
 		for(var i = 0; i < data.length; i++)
 		{
 			renderChapter(data[i]);
@@ -131,7 +134,8 @@ function createNode(description) {
 			"chapterid":document.chapterid
 		}
 	}).done(function(json) {
-		var data = JSON.parse(json);
+		//var data = JSON.parse(json);
+		var data = json;
 		renderNode(data);
 		document.nodeid = data.id;
 		loadCurrentNode();
@@ -152,7 +156,8 @@ function loadNodes(){
                 url: "/data/nodes",
                 data: { "chapterid": document.chapterid }
         }).done(function(json) {
-                var data = JSON.parse(json);
+                //var data = JSON.parse(json);
+                var data = json;
 
 		for(var i = 0; i < data.length; i++)
 		{
@@ -195,20 +200,22 @@ function loadCurrentNode() {
                 type: "GET",
                 url: "/data/node/"+document.nodeid
         }).done(function(json) {
-		var data = JSON.parse(json);
+		//var data = JSON.parse(json);
+		var data = json;
 		$("textarea.rich-text").val(data.text);	
-		$("select#transition-options").val(data.transition_id);
-		$("select#location-options").val(data.location);
+		$("#transition-options").val(data.transition_id);
+		setCurrentLocations(data.location);
 		execNext();
         });
 }
 
-function loadLocationList() {
+/*function loadLocationList() {
 	$.ajax({
                 type: "GET",
                 url: "/data/tags"
         }).done(function(json) {
-		var data = JSON.parse(json);
+		//var data = JSON.parse(json);
+		var data = json;
 		
 		for(var i = 0; i < data.length; i++)
 		{
@@ -216,7 +223,7 @@ function loadLocationList() {
 		}
 		execNext();
         });
-}
+}*/
 
 
 
@@ -272,9 +279,9 @@ function updateMap(self) {
     });
 }
 
-$(document).ready(function() {
+function setupMap() {
 
-	var self = this;  // the HTMLDocument
+	var self = document;  // the HTMLDocument
 
         $.get('/data/tags', function(data) {
             self.keywords = data;
@@ -286,10 +293,11 @@ $(document).ready(function() {
             self.map.on('moveend', function(e) {
                 updateMap(self);
             });
+	    execNext();
         }, "json");
 
 
-});
+}
 
 function getCurrentLocations()
 {
@@ -307,7 +315,15 @@ function getCurrentLocations()
 
 }
 
-function setCurrentLocation()
+function setCurrentLocations(locations)
 {
-	
+	var locs = locations.split(',');
+	for(var i = 0; i < locs.length; i++)
+	{
+		document.map.addLayer(document.layers[locs[i]]);
+	}
 }
+
+
+
+

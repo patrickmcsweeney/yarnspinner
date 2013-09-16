@@ -2,7 +2,7 @@
 
 $f3=require('lib/base.php');
 require('lib/rb.php');
-R::setup('mysql:host=mysql3.ecs.soton.ac.uk;dbname=yarnspinner','yarnspinner','veca69minu');
+R::setup('mysql:host=localhost;dbname=yarnspinner','yarnspinner','password');
 
 $f3->config('config.ini');
 
