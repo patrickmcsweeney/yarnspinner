@@ -2,7 +2,7 @@
 
 $f3=require('lib/base.php');
 require('lib/rb.php');
-R::setup('mysql:host=localhost;dbname=yarnspinner','yarnspinner','password');
+R::setup('mysql:host=mysql3.ecs.soton.ac.uk;dbname=yarnspinner','yarnspinner','veca69minu');
 
 $f3->config('config.ini');
 
@@ -71,6 +71,7 @@ function set_start_chapter($f3)
 		if($c->id == $chapter->id) {
 			$yarn->startChapter = $chapter;
 			R::store($yarn);
+			header('Content-type: application/json');
 			echo json_encode($yarn->export());
 			return;
 		}
@@ -82,12 +83,14 @@ function set_start_chapter($f3)
 function create_yarn($f3)
 {
 	$yarn = new_yarn($_REQUEST["title"], $_REQUEST["description"]);
+	header('Content-type: application/json');
 	echo json_encode($yarn->export());
 }
 
 function yarns($f3)
 {
 	$yarns = R::findAll('yarn');
+	header('Content-type: application/json');
 	echo json_encode(R::exportAll($yarns));
 }
 
@@ -99,6 +102,7 @@ function get_yarn($f3)
 	{
 		$f3->error(404);
 	}
+	header('Content-type: application/json');
 	echo json_encode($yarn->export());
 }
 
@@ -115,6 +119,7 @@ function create_chapter($f3)
 	$chapter->title = $_REQUEST["title"];
 	$yarn->ownChapter[] = $chapter;
 	R::store($yarn);
+	header('Content-type: application/json');
 	echo json_encode( array("id"=>$chapter->id, "title"=>$chapter->title));
 }
 
@@ -127,6 +132,7 @@ function chapters($f3)
 	}
 	$chapters = $yarn->ownChapter;
 	#echo count($chapters);
+	header('Content-type: application/json');
 	echo json_encode(R::exportAll($chapters));
 }
 
@@ -138,7 +144,9 @@ function get_chapter($f3)
 	{
 		$f3->error(404);
 	}
-	echo json_encode($chapter->export());
+	header('Content-type: application/json');
+	$export = R::exportAll($chapter);
+	echo json_encode($export[0]);
 }
 
 /* Nodes */
@@ -147,10 +155,13 @@ function create_node($f3) {
 	$chapter = R::load("chapter", $_REQUEST["chapterid"]);
 	$node = R::dispense("node");
 	$node->description = $_REQUEST["description"];
+	$node->text = "";
+
 	$chapter->ownNode[] = $node;
 	R::store($chapter);
 	
-	echo json_encode(array("id"=>$node->id, "description"=>$node->description));
+	header('Content-type: application/json');
+	echo json_encode($node->export());
 
 }
 
@@ -163,12 +174,14 @@ function nodes($f3)
 	}
 	$nodes = $chapter->ownNode;
 
+	header('Content-type: application/json');
 	echo json_encode(R::exportAll($nodes));
 }
 
 function get_node($f3)
 {
 	$node = R::load("node", $f3->get("PARAMS.id"));
+	header('Content-type: application/json');
 	echo json_encode($node->export());
 }
 
@@ -184,7 +197,6 @@ function update_node($f3)
 	{
 		$f3->error(404);
 	}
-	print "0";
 
 	$yarn = $node->chapter->yarn;
 	$chapters = $yarn->ownChapter;
@@ -195,17 +207,15 @@ function update_node($f3)
 			$valid_chapter = true;
 		}
 	}
-	print "1";
 	
 	if(!$valid_chapter) {
 		$f3->error(404);
 	}
-	print "2";
 	$node->transition = $transition;
 	$node->text = $_REQUEST["text"];
 	$node->location = $_REQUEST["location"];
-	print "3";
 	R::store($node);	
+	header('Content-type: application/json');
 	echo json_encode($node->export());
 }
 
@@ -233,6 +243,7 @@ function set_next_chapter($f3)
 		if($c->id == $chapter->id) {
 			$node->nextChapter = $chapter;
 			R::store($node);
+			header('Content-type: application/json');
 			echo json_encode($node->export());
 			return;
 		}
