@@ -3,11 +3,11 @@ html, body{
 	padding:0;
 }
 .chapters {
-	width: 25%;
+	width: 20%;
 	height: 95%;
 	padding: 10px;
 	float: left;
-	background-color: red;
+	background-color: grey;
 	font-size: 14pt;
 }
 .node-text {
@@ -16,25 +16,30 @@ html, body{
 	width: 70%;
 	min-height: 400px;
 	float:left;
-	background-color: green;
+	background-color: teal;
 }
 .node-selector {
-	background-color:purple;
+	background-color:grey;
 	padding-left: 2em;
 	font-size: 10pt;
 }
 .node-attributes {
-	background-color:gray;
+	background-color:teal;
 }
 .node-location{
 	height: 3em;
-	background-color:yellow;
+	background-color:grey;
 }
 .node-summary {
 	height: 3em;
-	background-color:teal;
+	background-color:grey;
 }
 textarea {
 	width:100%;
 	height:45%;
+}
+
+.map {
+	width: 100%;
+	height:400px;
 }

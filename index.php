@@ -21,6 +21,17 @@ function tags()
 {
 	echo file_get_contents('http://tools.southampton.ac.uk/places/keywords/keywords.json');
 }
+function areas($f3)
+{
+#	echo 'http://tools.southampton.ac.uk/places/areas/'.$f3->get("PARAMS.file");
+	$url = 'http://tools.southampton.ac.uk/places/areas/'.$f3->get("PARAMS.file");
+	if(array_key_exists("bounding",$_REQUEST))
+	{
+		$url .= "?bounding=".$_REQUEST["bounding"];
+	}
+
+	echo file_get_contents($url);
+}
 
 /* Yarns */
 
