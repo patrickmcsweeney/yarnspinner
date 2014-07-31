@@ -67,14 +67,14 @@ function renderChapter(data)
 
 function switchChapter(event) {
 	document.chapterid = $(event.target).data('id');
-	document.functionList = document.refreshEverything.slice(0); 
+	document.functionList = document.refreshEverything.slice(1); 
 	execNext();
 	
 }
 
 function switchNode(event) {
 	document.nodeid = $(event.target).data('id');
-	document.functionList = document.refreshEverything.slice(2); 
+	document.functionList = document.refreshEverything.slice(3); 
 	execNext();
 }
 
