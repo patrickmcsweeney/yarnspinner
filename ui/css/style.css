@@ -26,6 +26,7 @@ html, body{
 }
 .node-attributes {
 	background-color:B5D045;
+	margin: 1em 0;
 }
 .node-location{
 	height: 3em;
@@ -44,4 +45,12 @@ textarea {
 .map {
 	width: 100%;
 	height:400px;
+}
+
+.node-title, .node-save {
+	margin: 1em 0;
+}
+
+.rich-text {
+	height: 18em;
 }

@@ -2,9 +2,11 @@
 
 $f3=require('lib/base.php');
 require('lib/rb.php');
-R::setup('mysql:host=mysql3.ecs.soton.ac.uk;dbname=yarnspinner','yarnspinner','veca69minu');
 
 $f3->config('config.ini');
+$f3->config('secrets.ini');
+$f3->set('base_url', $f3->get("SCHEME")."://".$f3->get("HOST").$f3->get("BASE"));
+R::setup('mysql:host='.$f3->get("db_host").';dbname='.$f3->get("db_name"), $f3->get("db_user"),$f3->get("db_password"));
 
 function home($f3) 
 {
@@ -40,14 +42,16 @@ function new_yarn($title, $description)
 	# Create an initial chapter
 	$chapter = R::dispense("chapter");
 	$chapter->title = "New Chapter";
+	$chapter->title = "New Chapter";
 	R::store($chapter);
 
 	# Create the yarn
 	$yarn = R::dispense("yarn");
 	$yarn->title = $title;
 	$yarn->description = $description;
+	$yarn->publisheddate = date("c");
 	$yarn->ownChapter[] = $chapter;
-	$yarn->startChapter = $chapter;
+	$yarn->startchapterid = $chapter;
 	R::store($yarn);
 }
 
@@ -94,6 +98,25 @@ function yarns($f3)
 	echo json_encode(R::exportAll($yarns));
 }
 
+function export_stories($f3)
+{
+	$yarns = R::findAll('yarn');
+	
+	$stories = array();
+	foreach($yarns as $yarn)
+	{
+		$story["startchapteruri"] = $f3->get("base_url").$f3->get("PARAMS.0");
+		$story["title"] = $yarn->title;
+		$story["description"] = $yarn->description;
+		$story["publisheddate"] = date("c");
+		#$story["startchapteruri"] = $f3->get("base_url")."/export/chapters?yarnid=".$yarn->startchapter->id;
+		array_push($stories, $story);
+	}
+	
+	header('Content-type: application/json');
+	echo json_encode($stories);
+}
+
 function get_yarn($f3)
 {
 	$id = $f3->get('PARAMS.id');
@@ -134,6 +157,33 @@ function chapters($f3)
 	#echo count($chapters);
 	header('Content-type: application/json');
 	echo json_encode(R::exportAll($chapters));
+}
+
+function export_chapter($f3)
+{
+	$chapter = R::load('chapter',$f3->get("PARAMS.chapterid"));
+	if(!$chapter->id)
+	{
+		$f3->error(404);
+	}
+	
+	$chapter_export = array();
+	$chapter_export["uri"] = $f3->get("base_url").$f3->get("PARAMS.0");	
+	$chapter_export["pages"] = array();
+	foreach($chapter->ownNode as $node)
+	{
+		$page = array();
+		$page["id"] = $node->id;
+		$page["title"] = $node->description;
+		$page["content"] = $node->text;
+		$page["nextchapteruri"] = $f3->get("base_url")."/export/chapter/".$node->transition->id;
+		$page["locations"] = array( array("type"=>"polygon","location"=> $node->location) );
+		$chapter_export["pages"][] = $page;
+
+	}
+
+	header('Content-type: application/json');
+	echo json_encode($chapter_export);
 }
 
 function get_chapter($f3)

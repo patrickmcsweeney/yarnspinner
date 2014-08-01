@@ -174,8 +174,8 @@ function loadNodes(){
 function saveNode() {
 	var data = {};
 	data.nodeid = document.nodeid;
-	data.text = $("textarea.rich-text").val();
-	data.transition = $("select#transition-options").val();
+	data.text = getNodeText() 
+	data.transition = getNodeTransition();
 	data.location = getCurrentLocations(); 
 	$.ajax({
                 type: "POST",
@@ -190,8 +190,8 @@ function saveNode() {
 
 function loadCurrentNode() {
 	if(null == document.nodeid){ 
-		$("textarea.rich-text").val("");	
-		$("select#transition-options").val("");
+		setNodeText("");	
+		setNodeTransition("");
 		$("select#location-options").val("");
 		addNode();
 		return;
@@ -202,31 +202,37 @@ function loadCurrentNode() {
         }).done(function(json) {
 		//var data = JSON.parse(json);
 		var data = json;
-		$("textarea.rich-text").val(data.text);	
-		$("#transition-options").val(data.transition_id);
+		setNodeTitle(data.description);
+		setNodeText(data.text);
+		setNodeTransition(data.transition_id);
 		setCurrentLocations(data.location);
 		execNext();
         });
 }
 
-/*function loadLocationList() {
-	$.ajax({
-                type: "GET",
-                url: "/data/tags"
-        }).done(function(json) {
-		//var data = JSON.parse(json);
-		var data = json;
-		
-		for(var i = 0; i < data.length; i++)
-		{
-			$("select#location-options").mustache('location-option', {name:data[i]});	
-		}
-		execNext();
-        });
-}*/
+function getNodeText()
+{
+	return $("textarea.rich-text").val();
+}
+function setNodeText(text)
+{
+	$("textarea.rich-text").val(text);	
+}
 
+function setNodeTitle(title)
+{
+	$(".node-title").html(title);
+}
 
+function getNodeTransition()
+{
+	return $("select#transition-options").val();
+}
 
+function setNodeTransition(nextChapter)
+{
+	$("#transition-options").val(nextChapter);
+}
 
 function initMap(self) {
 
@@ -301,7 +307,7 @@ function setupMap() {
 
 function getCurrentLocations()
 {
-	var locations = Object.keys(document.layers)
+	var locations = Object.keys(document.layers);
 	
 	var output = [];
 	for(var i=0; i < locations.length; i++) {
@@ -317,11 +323,22 @@ function getCurrentLocations()
 
 function setCurrentLocations(locations)
 {
+	clearLocations();
 	var locs = locations.split(',');
 	for(var i = 0; i < locs.length; i++)
 	{
 		document.map.addLayer(document.layers[locs[i]]);
 	}
+}
+
+function clearLocations()
+{
+	var locations = Object.keys(document.layers);
+	for(var i=0; i < locations.length; i++)
+	{
+		document.map.removeLayer(document.layers[locations[i]]);
+	}
+
 }
 
 

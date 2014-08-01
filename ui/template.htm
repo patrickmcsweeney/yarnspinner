@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 	<title>Geospacial narrative creation - YarnSpinner</title>
 	<link rel="stylesheet" href="/ui/css/style.css" type="text/css" />
@@ -7,16 +8,18 @@
 	<script src="http://tools.southampton.ac.uk/fluffer-test/resources/leaflet.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	<script src="https://rawgithub.com/jonnyreeves/jquery-Mustache/master/jquery.mustache.js"></script>
-<script src="https://rawgithub.com/janl/mustache.js/master/mustache.js"></script>
+	<script src="https://rawgithub.com/janl/mustache.js/master/mustache.js"></script>
 	<script type="text/javascript" src="/ui/js/yarnspinner.js"></script>
-<!--	<script type="text/javascript" src="/ui/js/tinymce/tinymce.min.js"></script>
-	<script type="text/javascript">
-	tinymce.init({
-	    selector: "textarea.rich-text",
-	    height: '100%'
+	<script type="text/javascript" src="/ui/ckeditor/ckeditor.js"></script>
+	<script type="text/javascript" src="/ui/ckeditor/adapters/jquery.js"></script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
-	 });
-	</script>-->
+<!-- Optional theme -->
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
 </head>
 <body>
@@ -25,19 +28,24 @@
 		<input type="button" value="Add node" onclick="addNode()"/>
 	</div>
 	<div class="node-manager">
-		<div class="node-text">
-			<form name="main-text" action="/save/text/">
-				<textarea class="rich-text"></textarea>
-			</form>
+		<div class="row">
+			<div class="col-md-9"><h2 class="node-title">Node title</h2></div>
+			<div class="col-md-3"><input type="button" class="btn btn-lg btn-primary node-save" value="Save current node" onclick="saveNode()" /></div>
 		</div>
-		<div class="node-attributes">
-			<p>Next chapter: 
+		<div class="node-attributes row">
+			<label for="transition-options">Next chapter:</label>
 				<select id="transition-options">
 
 				</select>
-			</p>	
-			<input type="button" value="Save current node" onclick="saveNode()" />
 
+		</div>
+		<div class="node-text">
+			<form name="main-text" action="/save/text/">
+				<textarea class="rich-text" id="ckeditor"></textarea>
+			</form>
+			<script>
+				$( 'textarea#ckeditor' ).ckeditor();
+			</script>
 		</div>
 		<div class="node-location">
 			<div class="map" id="map">
