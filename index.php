@@ -146,6 +146,16 @@ function create_chapter($f3)
 	echo json_encode( array("id"=>$chapter->id, "title"=>$chapter->title));
 }
 
+function delete_chapter($f3)
+{
+	$chapter = R::load('chapter',$_REQUEST["chapterid"]);
+	if(!$chapter->id)
+	{
+		$f3->error(404);
+	}
+	R::trash($chapter);
+}
+
 function chapters($f3)
 {
 	$yarn = R::load('yarn',$_REQUEST["yarnid"]);
@@ -235,6 +245,12 @@ function get_node($f3)
 	echo json_encode($node->export());
 }
 
+function delete_node($f3)
+{
+	$node = R::load("node", $_REQUEST["nodeid"]);
+	R::trash($node);
+}
+
 function update_node($f3)
 {
 	$node = R::load("node", $_REQUEST["nodeid"]);
@@ -264,6 +280,7 @@ function update_node($f3)
 	$node->transition = $transition;
 	$node->text = $_REQUEST["text"];
 	$node->location = $_REQUEST["location"];
+	$node->locationtype = $_REQUEST["locationtype"];
 	R::store($node);	
 	header('Content-type: application/json');
 	echo json_encode($node->export());

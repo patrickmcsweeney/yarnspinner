@@ -3,7 +3,7 @@ document.chapterid = 1;
 document.nodeid = 1;
 $.Mustache.load('/jstemplates');
 //document.refreshEverything = [loadChapters, loadNodes,loadLocationList,loadCurrentNode];
-document.refreshEverything = [setupMap, loadChapters, loadNodes,loadCurrentNode];
+document.refreshEverything = [ loadChapters, loadNodes,loadCurrentNode];
 document.functionList = document.refreshEverything.slice(0); 
 
 $(document).ready(function() {
@@ -59,23 +59,56 @@ function createChapter(title) {
 function renderChapter(data)
 {
 	var chapter = $($.Mustache.render('chapter', data));
-	chapter.data('id', data.id);
-	chapter.click(switchChapter);
+	chapter.find(".title").data('id', data.id);
+	chapter.find(".title").click(switchChapter);
+	chapter.find(".delete").data('id', data.id);
+	chapter.find(".delete").click(deleteChapter);
 	$(".chapters").append(chapter);
 	return chapter;
 }
 
 function switchChapter(event) {
 	document.chapterid = $(event.target).data('id');
-	document.functionList = document.refreshEverything.slice(1); 
+	document.functionList = document.refreshEverything.slice(0); 
+	execNext();
+	
+}
+
+function deleteChapter(event) {
+	event.preventDefault();
+	document.chapterid = $(event.target).data('id');
+	$.ajax({
+		type:"GET",
+		url:"/delete/chapter",
+		async:false,
+		data: {
+			chapterid : $(event.target).data('id')
+		}
+	});
+	document.functionList = document.refreshEverything.slice(0); 
+	$(event.target).parent().remove();
 	execNext();
 	
 }
 
 function switchNode(event) {
+	event.preventDefault();
+	console.log($(event.target).data('id'));
 	document.nodeid = $(event.target).data('id');
-	document.functionList = document.refreshEverything.slice(3); 
+	document.functionList = document.refreshEverything.slice(2); 
 	execNext();
+}
+
+function deleteNode(event) {
+	event.preventDefault();
+	$.ajax({
+		type:"GET",
+		url:"/delete/node",
+		data: {
+			nodeid : $(event.target).data('id')
+		}
+	});
+	$(event.target).parent().remove();
 }
 
 function loadChapters(){
@@ -144,8 +177,10 @@ function createNode(description) {
 
 function renderNode(data) {
 	var node = $($.Mustache.render('node', data));
-	node.data('id', data.id);
-	node.click(switchNode);
+	node.find(".title").data('id', data.id);
+	node.find(".title").click(switchNode);
+	node.find(".delete").data('id', data.id);
+	node.find(".delete").click(deleteNode);
 	$(".node-selector").append(node);
 	return node;
 }
@@ -176,7 +211,9 @@ function saveNode() {
 	data.nodeid = document.nodeid;
 	data.text = getNodeText() 
 	data.transition = getNodeTransition();
-	data.location = getCurrentLocations(); 
+	var loc = getCurrentLocations(); 
+	data.locationtype = loc.type;
+	data.location = loc.string; 
 	$.ajax({
                 type: "POST",
                 url: "/save/node",
@@ -205,7 +242,8 @@ function loadCurrentNode() {
 		setNodeTitle(data.description);
 		setNodeText(data.text);
 		setNodeTransition(data.transition_id);
-		setCurrentLocations(data.location);
+		locationType = data.locationtype ? data.locationtype : "general";
+		setCurrentLocations( locationType, data.location);
 		execNext();
         });
 }
@@ -307,22 +345,41 @@ function setupMap() {
 
 function getCurrentLocations()
 {
-	var locations = Object.keys(document.layers);
-	
-	var output = [];
-	for(var i=0; i < locations.length; i++) {
-		var layer = document.layers[locations[i]];
-		if(document.map.hasLayer(layer)){
-			output.push(locations[i]);
-		}
-	}	
-
-	return output.join();
+	var location = {}
+	if($("#lat").length > 0)
+	{
+		location.type = "specific";
+		location.string = $("#lat").val() + "," + $("#lon").val();	
+		return location;
+	}else{
+		var locations = Object.keys(document.layers);
+		
+		var output = [];
+		for(var i=0; i < locations.length; i++) {
+			var layer = document.layers[locations[i]];
+			if(document.map.hasLayer(layer)){
+				output.push(locations[i]);
+			}
+		}	
+		var ret = {};
+		ret.type = "general";
+		ret.string = output.join();
+		return ret;
+	}
 
 }
 
-function setCurrentLocations(locations)
+function setCurrentLocations(type, locations)
 {
+	locationTab(null,type);
+	if(type == "specific")
+	{
+		var loc = locations.split(",");
+		$("#lat").val(loc[0]);
+		$("#lon").val(loc[1]);
+		map.setCenter({lat:parseFloat(loc[0]), lng:parseFloat(loc[1])});
+		return;
+	}
 	clearLocations();
 	var locs = locations.split(',');
 	for(var i = 0; i < locs.length; i++)
@@ -341,6 +398,78 @@ function clearLocations()
 
 }
 
+function locationTab(e,tab)
+{	
+	if(e != null)
+	{
+		e.preventDefault();
+	}
+	$(".node-location .nav-tabs li").removeClass('active');
+	$(".node-location .nav-tabs li."+tab).addClass('active');
+	
+	if($('.location-tab.'+tab).length > 0)
+	{
+		return;	
+	}
+
+	var locationTab = $('.location-tab');
+	locationTab.html("");
+	locationTab.mustache(tab+'-location');
+	locationTab.removeClass();
+	locationTab.addClass('location-tab');
+	locationTab.addClass(tab);
+}
 
 
+var map;
+var berkeley = new google.maps.LatLng(50.935651, -1.3959649999999328);
+var sv = new google.maps.StreetViewService();
+
+var panorama;
+
+function initializeStreetView() {
+
+  panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'));
+
+  // Set up the map
+  var mapOptions = {
+    center: berkeley,
+    zoom: 16,
+    streetViewControl: false
+  };
+  map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+
+  // getPanoramaByLocation will return the nearest pano when the
+  // given radius is 50 meters or less.
+  google.maps.event.addListener(map, 'click', function(event) {
+      sv.getPanoramaByLocation(event.latLng, 50, processSVData);
+	//console.log(event.latLng);
+	setLatLon(event.latLng.lat(), event.latLng.lng());
+  });
+  google.maps.event.addListener(panorama, 'position_changed', function() {
+	var pos = panorama.getPosition();
+  });
+
+}
+
+function setLatLon(lat, lon)
+{
+	$("#lat").val(lat);
+	$("#lon").val(lon);
+}
+
+function processSVData(data, status) {
+  if (status == google.maps.StreetViewStatus.OK) {
+    panorama.setPano(data.location.pano);
+    panorama.setPov({
+      heading: 270,
+      pitch: 0
+    });
+    panorama.setVisible(true);
+
+  } else {
+    alert('Street View data not found for this location.');
+  }
+}
 

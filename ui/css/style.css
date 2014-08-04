@@ -11,6 +11,10 @@ html, body{
 	background-color: B5D045;
 	font-size: 14pt;
 }
+
+a.chapter {
+	display: block;
+}
 .node-text {
 }
 .node-manager {
@@ -53,4 +57,13 @@ textarea {
 
 .rich-text {
 	height: 18em;
+}
+
+.node-location {
+	margin: 2em 0;
+}
+
+.location-tab {
+	height: 400px;
+	margin: 2em;
 }

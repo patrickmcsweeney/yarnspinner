@@ -1,8 +1,8 @@
 <script id="chapter" type="text/html">
-    <div class="chapter">{{title}}</div>
+    <div class="chapter"><a class="title">{{title}}</a> - <span style="font-size:small">[<a class="delete">delete</a>]</span></div>
 </script>
 <script id="node" type="text/html">
-    <div class="node">{{description}}</div>
+    <div class="node"><a class="title" href="/data/node?nodeid={{id}}">{{description}}</a> - [<a class="delete" href="/data/node?nodeid={{id}}">delete</a>]</div>
 </script>
 <script id="transition-option" type="text/html">
     <option value="{{id}}" class="transition">{{title}}</option>
@@ -14,4 +14,20 @@
 	<div class="node-selector">
 
 	</div>
+</script>
+<script id="specific-location" type="text/html">
+	<label for="lat">Latitude:</label><input type="text" id="lat">
+	<label for="lon">Longitude:</label><input type="text" id="lon">
+	<div id="map-canvas" style="width: 45%; height: 100%;float:left"></div>
+	<div id="pano" style="width: 45%; height: 100%;float:left"></div>
+	<script type="text/javascript">
+	//	google.maps.event.addDomListener(window, 'load', initializeStreetView);
+		initializeStreetView();
+	</script>
+</script>
+<script id="general-location" type="text/html">
+	<div id="map" class="map"></div>
+	<script type="text/javascript">
+		setupMap();
+	</script>
 </script>
