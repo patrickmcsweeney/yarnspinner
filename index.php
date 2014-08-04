@@ -105,11 +105,12 @@ function export_stories($f3)
 	$stories = array();
 	foreach($yarns as $yarn)
 	{
-		$story["startchapteruri"] = $f3->get("base_url").$f3->get("PARAMS.0");
+		$story["uri"] = $f3->get("base_url").$f3->get("PARAMS.0");
 		$story["title"] = $yarn->title;
 		$story["description"] = $yarn->description;
 		$story["publisheddate"] = date("c");
-		#$story["startchapteruri"] = $f3->get("base_url")."/export/chapters?yarnid=".$yarn->startchapter->id;
+		$chapter = array_shift($yarn->ownChapter);
+		$story["startchapteruri"] = $f3->get("base_url")."/export/chapter/".$chapter->id;
 		array_push($stories, $story);
 	}
 	
@@ -186,8 +187,11 @@ function export_chapter($f3)
 		$page["id"] = $node->id;
 		$page["title"] = $node->description;
 		$page["content"] = $node->text;
-		$page["nextchapteruri"] = $f3->get("base_url")."/export/chapter/".$node->transition->id;
-		$page["locations"] = array( array("type"=>"polygon","location"=> $node->location) );
+		if(isset($node->transition))
+		{
+			$page["nextchapteruri"] = $f3->get("base_url")."/export/chapter/".$node->transition->id;
+		}
+		$page["locations"] = array( array("type"=>$node->locationtype,"location"=> $node->location) );
 		$chapter_export["pages"][] = $page;
 
 	}
